@@ -4,7 +4,7 @@ import java.util.*
 
 
 fun main(args: Array<String>) {
-    val seed = args[0]?.toLong()
+    val seed = args[0].toLong()
     val random = Random(seed)
 
     println("What is your name?")
@@ -27,9 +27,12 @@ fun main(args: Array<String>) {
 
         println("Do you want to continue, $name?")
 
-        when (readLine()) {
-            "y" -> exec = true
-            "n" -> exec = false
-        }
+        exec = checkContinue()
     }
+}
+
+private fun checkContinue(): Boolean = when (readLine()) {
+"y" -> true
+"n" -> false
+else -> true
 }
