@@ -1,33 +1,35 @@
 package fpmax
 
-import kotlin.random.Random
+import java.util.*
 
 
 fun main(args: Array<String>) {
-        println("What is your name?")
+    val seed = args[0]?.toLong()
+    val random = Random(seed)
 
-        val name = readLine()
+    println("What is your name?")
 
-        println("Hello, " + name + ", welcome to the game!")
+    val name = readLine()
 
-        var exec = true
+    println("Hello, $name, welcome to the game!")
 
-        while (exec) {
-            val num = Random.nextInt(5) + 1
+    var exec = true
 
-            println("Dear $name, please guess a number from 1 to 5:")
+    while (exec) {
+        val num = random.nextInt(5) + 1
 
-            val guess = readLine()?.toInt()
+        println("Dear $name, please guess a number from 1 to 5:")
 
-            if (guess == num) println("You guessed right, $name!")
-            else println("You guessed wrong, $name! The number was: $num")
+        val guess = readLine()?.toInt()
 
-            println("Do you want to continue, $name?")
+        if (guess == num) println("You guessed right, $name!")
+        else println("You guessed wrong, $name! The number was: $num")
 
-            val answer = readLine()
-            when {
-                answer == "y" -> exec = true
-                answer == "n" -> exec = false
-            }
+        println("Do you want to continue, $name?")
+
+        when (readLine()) {
+            "y" -> exec = true
+            "n" -> exec = false
         }
     }
+}
