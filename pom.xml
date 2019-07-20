@@ -15,6 +15,7 @@
         <kotlin.version>1.3.31</kotlin.version>
         <kotlin.code.style>official</kotlin.code.style>
         <junit.version>4.12</junit.version>
+        <arrow.version>0.9.0</arrow.version>
     </properties>
 
     <dependencies>
@@ -23,6 +24,14 @@
             <artifactId>kotlin-stdlib</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.arrow-kt</groupId>
+            <artifactId>arrow-core-data</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
+
+
+
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test-junit</artifactId>
