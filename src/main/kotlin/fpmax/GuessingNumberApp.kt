@@ -31,8 +31,9 @@ fun main(args: Array<String>) {
     }
 }
 
-private fun checkContinue(): Boolean = when (readLine()) {
-"y" -> true
-"n" -> false
-else -> true
-}
+private fun checkContinue(): Boolean =
+    when (readLine()?.toLowerCase()) {
+        "y" -> true
+        "n" -> false
+        else -> true
+    }
