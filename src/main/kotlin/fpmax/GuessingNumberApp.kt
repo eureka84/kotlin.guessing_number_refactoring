@@ -3,6 +3,7 @@ package fpmax
 import arrow.core.Option
 import arrow.core.Try
 import arrow.core.getOrElse
+import arrow.effects.IO
 import java.util.*
 
 
@@ -10,39 +11,42 @@ fun main(args: Array<String>) {
     val seed = args[0].toLong()
     val random = Random(seed)
 
-    println("What is your name?")
+    putStrLine("What is your name?").unsafeRunSync()
 
-    val name = readLine()
+    val name = readStrLine().unsafeRunSync()
 
-    println("Hello, $name, welcome to the game!")
+    putStrLine("Hello, $name, welcome to the game!").unsafeRunSync()
 
+    gameLoop(random, name)
+}
+
+private fun gameLoop(random: Random, name: String?) {
     var exec = true
 
     while (exec) {
         val num = random.nextInt(5) + 1
 
-        println("Dear $name, please guess a number from 1 to 5:")
+        putStrLine("Dear $name, please guess a number from 1 to 5:").unsafeRunSync()
 
         val guess = readGuess()
         val guessedRight = guess.map { g -> g == num }.getOrElse { false }
 
-        if (guessedRight) println("You guessed right, $name!")
-        else println("You guessed wrong, $name! The number was: $num")
+        if (guessedRight) putStrLine("You guessed right, $name!").unsafeRunSync()
+        else putStrLine("You guessed wrong, $name! The number was: $num").unsafeRunSync()
 
-        println("Do you want to continue, $name?")
+        putStrLine("Do you want to continue, $name?").unsafeRunSync()
 
         exec = checkContinue()
     }
 }
 
-private fun readGuess(): Option<Int> =
-    readLine()
-        .toOption()
-        .flatMap { input -> Try { input.toInt() }.toOption() }
+fun putStrLine(message: String): IO<Unit> = IO { println(message) }
+fun readStrLine(): IO<String?> = IO { readLine()}
 
-private fun <T> T?.toOption(): Option<T> = Option.fromNullable(this)
+fun readGuess(): Option<Int> =
+    readStrLine().unsafeRunSync().let { input -> Try { input!!.toInt() }.toOption() }
 
-private fun checkContinue(): Boolean =
+fun checkContinue(): Boolean =
     when (readLine()?.toLowerCase()) {
         "y" -> true
         "n" -> false

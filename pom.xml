@@ -29,6 +29,11 @@
             <artifactId>arrow-core-data</artifactId>
             <version>${arrow.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.arrow-kt</groupId>
+            <artifactId>arrow-effects-data</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
 
 
 
