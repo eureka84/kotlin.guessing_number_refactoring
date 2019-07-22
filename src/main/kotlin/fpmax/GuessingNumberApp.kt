@@ -11,44 +11,47 @@ fun main(args: Array<String>) {
     val seed = args[0].toLong()
     val random = Random(seed)
 
-    putStrLine("What is your name?").unsafeRunSync()
+    program(random).unsafeRunSync()
 
-    val name = readStrLine().unsafeRunSync()
-
-    putStrLine("Hello, $name, welcome to the game!").unsafeRunSync()
-
-    gameLoop(random, name)
 }
 
-private fun gameLoop(random: Random, name: String?) {
-    var exec = true
+private fun program(random: Random): IO<Unit> =
+    putStrLine("What is your name?")
+        .flatMap { readStrLine() }
+        .flatMap { name ->
+            putStrLine("Hello, $name, welcome to the game!")
+                .flatMap { gameLoop(random, name) }
+        }
 
-    while (exec) {
-        val num = random.nextInt(5) + 1
-
-        putStrLine("Dear $name, please guess a number from 1 to 5:").unsafeRunSync()
-
-        val guess = readGuess()
-        val guessedRight = guess.map { g -> g == num }.getOrElse { false }
-
-        if (guessedRight) putStrLine("You guessed right, $name!").unsafeRunSync()
-        else putStrLine("You guessed wrong, $name! The number was: $num").unsafeRunSync()
-
-        putStrLine("Do you want to continue, $name?").unsafeRunSync()
-
-        exec = checkContinue()
-    }
-}
+private fun gameLoop(random: Random, name: String?): IO<Unit> =
+    IO { random.nextInt(5) + 1 }
+        .flatMap { num ->
+            putStrLine("Dear $name, please guess a number from 1 to 5:")
+                .flatMap { readGuess() }
+                .map { guess -> guess.map { g -> g == num }.getOrElse { false } }
+                .flatMap { guessedRight ->
+                    if (guessedRight) putStrLine("You guessed right, $name!")
+                    else putStrLine("You guessed wrong, $name! The number was: $num")
+                }
+                .flatMap { putStrLine("Do you want to continue, $name?") }
+                .flatMap { checkContinue() }
+                .flatMap { cont ->
+                    if (cont) gameLoop(random, name)
+                    else IO { Unit }
+                }
+        }
 
 fun putStrLine(message: String): IO<Unit> = IO { println(message) }
-fun readStrLine(): IO<String?> = IO { readLine()}
+fun readStrLine(): IO<String?> = IO { readLine() }
 
-fun readGuess(): Option<Int> =
-    readStrLine().unsafeRunSync().let { input -> Try { input!!.toInt() }.toOption() }
+fun readGuess(): IO<Option<Int>> =
+    readStrLine().map { input -> Try { input!!.toInt() }.toOption() }
 
-fun checkContinue(): Boolean =
-    when (readLine()?.toLowerCase()) {
-        "y" -> true
-        "n" -> false
-        else -> true
+fun checkContinue(): IO<Boolean> =
+    readStrLine().map { input ->
+        when (input?.toLowerCase()) {
+            "y" -> true
+            "n" -> false
+            else -> true
+        }
     }
