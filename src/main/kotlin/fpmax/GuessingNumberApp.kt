@@ -28,11 +28,7 @@ private fun gameLoop(random: Random, name: String?): IO<Unit> =
         .flatMap { num ->
             putStrLine("Dear $name, please guess a number from 1 to 5:")
                 .flatMap { readGuess() }
-                .map { guess -> guess.map { g -> g == num }.getOrElse { false } }
-                .flatMap { guessedRight ->
-                    if (guessedRight) putStrLine("You guessed right, $name!")
-                    else putStrLine("You guessed wrong, $name! The number was: $num")
-                }
+                .flatMap { guess -> evaluateGuess(guess, num, name) }
                 .flatMap { putStrLine("Do you want to continue, $name?") }
                 .flatMap { checkContinue() }
                 .flatMap { cont ->
@@ -40,6 +36,12 @@ private fun gameLoop(random: Random, name: String?): IO<Unit> =
                     else IO { Unit }
                 }
         }
+
+private fun evaluateGuess(guess: Option<Int>, num: Int, name: String?): IO<Unit> =
+    guess.map { g -> g == num }.getOrElse { false }.let { guessedRight ->
+        if (guessedRight) putStrLine("You guessed right, $name!")
+        else putStrLine("You guessed wrong, $name! The number was: $num")
+    }
 
 fun putStrLine(message: String): IO<Unit> = IO { println(message) }
 fun readStrLine(): IO<String?> = IO { readLine() }
