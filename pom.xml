@@ -34,8 +34,11 @@
             <artifactId>arrow-effects-data</artifactId>
             <version>${arrow.version}</version>
         </dependency>
-
-
+        <dependency>
+            <groupId>io.arrow-kt</groupId>
+            <artifactId>arrow-effects-extensions</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -49,6 +52,7 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -79,5 +83,12 @@
             </plugin>
         </plugins>
     </build>
+
+    <repositories>
+        <repository>
+            <id>maven-central</id>
+            <url>https://search.maven.org</url>
+        </repository>
+    </repositories>
 
 </project>
