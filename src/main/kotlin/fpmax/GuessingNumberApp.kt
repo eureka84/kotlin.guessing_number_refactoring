@@ -1,7 +1,13 @@
 package fpmax
 
-import arrow.core.*
+import arrow.Kind
+import arrow.core.ForOption
+import arrow.core.Option
+import arrow.core.Try
+import arrow.core.extensions.option.traverse.sequence
+import arrow.effects.ForIO
 import arrow.effects.IO
+import arrow.effects.extensions.io.applicative.applicative
 import java.util.*
 
 
@@ -35,14 +41,12 @@ private fun gameLoop(random: Random, name: String?): IO<Unit> =
                 }
         }
 
-private fun evaluateGuess(guess: Option<Int>, num: Int, name: String?): IO<Option<Unit>> =
+private fun evaluateGuess(guess: Option<Int>, num: Int, name: String?): Kind<ForIO, Kind<ForOption, Unit>> =
     guess.map { numberGuessed -> numberGuessed == num }
         .map { guessedRight ->
             if (guessedRight) putStrLine("You guessed right, $name!")
             else putStrLine("You guessed wrong, $name! The number was: $num")
-        }.sequence()
-
-fun <A> Option<IO<A>>.sequence(): IO<Option<A>> = this.fold({ IO { None } }, { value -> value.map { Some(it) } })
+        }.sequence(IO.applicative())
 
 fun putStrLine(message: String): IO<Unit> = IO { println(message) }
 fun readStrLine(): IO<String?> = IO { readLine() }
