@@ -34,11 +34,7 @@ private fun gameLoop(random: Random, name: String?): IO<Unit> =
                 .flatMap { readGuess() }
                 .flatMap { guess -> evaluateGuess(guess, num, name) }
                 .flatMap { putStrLine("Do you want to continue, $name?") }
-                .flatMap { checkContinue() }
-                .flatMap { cont ->
-                    if (cont) gameLoop(random, name)
-                    else IO { Unit }
-                }
+                .flatMap { checkContinue({ IO { Unit } }, { gameLoop(random, name) }) }
         }
 
 private fun evaluateGuess(guess: Option<Int>, num: Int, name: String?): Kind<ForIO, Kind<ForOption, Unit>> =
@@ -57,11 +53,11 @@ fun readStrLine(): IO<String?> = IO { readLine() }
 fun readGuess(): IO<Option<Int>> =
     readStrLine().map { input -> Try { input!!.toInt() }.toOption() }
 
-fun checkContinue(): IO<Boolean> =
-    readStrLine().map { input ->
+fun checkContinue(ifNo: () -> IO<Unit>, ifYes: () -> IO<Unit>): IO<Unit> =
+    readStrLine().flatMap { input ->
         when (input?.toLowerCase()) {
-            "y" -> true
-            "n" -> false
-            else -> true
+            "y" -> ifYes()
+            "n" -> ifNo()
+            else -> ifYes()
         }
     }
