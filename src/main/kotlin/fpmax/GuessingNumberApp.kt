@@ -42,10 +42,13 @@ private fun gameLoop(random: Random, name: String?): IO<Unit> =
         }
 
 private fun evaluateGuess(guess: Option<Int>, num: Int, name: String?): Kind<ForIO, Kind<ForOption, Unit>> =
-    guess.map { numberGuessed -> numberGuessed == num }
+    guess
+        .map { numberGuessed -> numberGuessed == num }
         .map { guessedRight ->
-            if (guessedRight) putStrLine("You guessed right, $name!")
-            else putStrLine("You guessed wrong, $name! The number was: $num")
+            if (guessedRight)
+                putStrLine("You guessed right, $name!")
+            else
+                putStrLine("You guessed wrong, $name! The number was: $num")
         }.sequence(IO.applicative())
 
 fun putStrLine(message: String): IO<Unit> = IO { println(message) }
