@@ -22,24 +22,28 @@ class GuessingGame<E>(
     private val monad: Monad<E>
 ) {
     fun play(): Kind<E, Unit> = monad.run {
-        console.writeLn("What is your name?")
+        console
+            .writeLn("What is your name?")
             .flatMap { console.readLn() }
             .flatMap { name ->
-                console.writeLn("Hello, $name, welcome to the game!")
+                console
+                    .writeLn("Hello, $name, welcome to the game!")
                     .flatMap { gameLoop(name) }
             }
     }
 
     private fun gameLoop(player: String?): Kind<E, Unit> =
         monad.run {
-            random.nextInt(5)
+            random
+                .nextInt(5)
                 .map { it + 1 }
                 .flatMap { num -> askPlayerToGuess(player, num) }
         }
 
     private fun askPlayerToGuess(name: String?, num: Int): Kind<E, Unit> =
         monad.run {
-            console.writeLn("Dear $name, please guess a number from 1 to 5:")
+            console
+                .writeLn("Dear $name, please guess a number from 1 to 5:")
                 .flatMap { readGuess() }
                 .flatMap { guess -> evaluateGuess(guess, num, name) }
                 .flatMap { console.writeLn("Do you want to continue, $name?") }
