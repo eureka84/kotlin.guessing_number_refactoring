@@ -37,24 +37,24 @@ class GuessingGame<E>(
             .flatMap { num -> askPlayerToGuess(player, num) }
     }
 
-    private fun askPlayerToGuess(name: String?, num: Int): Kind<E, Unit> = monad.run {
+    private fun askPlayerToGuess(player: String?, num: Int): Kind<E, Unit> = monad.run {
         console
-            .writeLn("Dear $name, please guess a number from 1 to 5:")
+            .writeLn("Dear $player, please guess a number from 1 to 5:")
             .flatMap { readGuess() }
-            .flatMap { guess -> evaluateGuess(guess, num, name) }
-            .flatMap { console.writeLn("Do you want to continue, $name?") }
-            .flatMap { checkContinue({ monad.just(Unit) }, { gameLoop(name) }) }
+            .flatMap { guess -> evaluateGuess(guess, num, player) }
+            .flatMap { console.writeLn("Do you want to continue, $player?") }
+            .flatMap { checkContinue({ monad.just(Unit) }, { gameLoop(player) }) }
     }
 
 
-    private fun evaluateGuess(guess: Option<Int>, num: Int, name: String?) =
+    private fun evaluateGuess(guess: Option<Int>, num: Int, player: String?) =
         guess
             .map { numberGuessed -> numberGuessed == num }
             .map { guessedRight ->
                 if (guessedRight)
-                    console.writeLn("You guessed right, $name!")
+                    console.writeLn("You guessed right, $player!")
                 else
-                    console.writeLn("You guessed wrong, $name! The number was: $num")
+                    console.writeLn("You guessed wrong, $player! The number was: $num")
             }.sequence(monad)
 
     private fun readGuess(): Kind<E, Option<Int>> = monad.run {
