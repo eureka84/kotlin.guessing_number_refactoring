@@ -11,13 +11,13 @@ interface Console<E> {
     fun readLn(): Kind<E, String?>
 }
 
-interface CustomRandom<E> {
-    fun nextInt(upper: Int): Kind<E, Int>
+interface RandomInt<E> {
+    fun next(upper: Int): Kind<E, Int>
 }
 
 class GuessingGame<E>(
     private val console: Console<E>,
-    private val random: CustomRandom<E>,
+    private val randomInt: RandomInt<E>,
     private val monad: Monad<E>
 ) {
     fun play(): Kind<E, Unit> = monad.run {
@@ -32,8 +32,8 @@ class GuessingGame<E>(
     }
 
     private fun gameLoop(player: String?): Kind<E, Unit> = monad.run {
-        random
-            .nextInt(5)
+        randomInt
+            .next(5)
             .map { it + 1 }
             .flatMap { num -> askPlayerToGuess(player, num) }
     }

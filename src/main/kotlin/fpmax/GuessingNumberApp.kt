@@ -12,7 +12,7 @@ fun main(args: Array<String>) {
     val seed = args[0].toLong()
     val random = Random(seed)
 
-    val guessingGame = GuessingGame(ConsoleIO, RandomIO(random), IO.monad())
+    val guessingGame = GuessingGame(ConsoleIO, RandomIntIO(random), IO.monad())
 
     val program: IO<Unit> = guessingGame.play().fix()
 
@@ -24,6 +24,6 @@ object ConsoleIO : Console<ForIO> {
     override fun writeLn(msg: String): Kind<ForIO, Unit> = IO { println(msg) }
 }
 
-class RandomIO(private val random: Random) : CustomRandom<ForIO> {
-    override fun nextInt(upper: Int): Kind<ForIO, Int> = IO { random.nextInt(upper) }
+class RandomIntIO(private val random: Random) : RandomInt<ForIO> {
+    override fun next(upper: Int): Kind<ForIO, Int> = IO { random.nextInt(upper) }
 }
