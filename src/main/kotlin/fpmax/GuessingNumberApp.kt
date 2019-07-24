@@ -1,6 +1,8 @@
 package fpmax
 
 import arrow.Kind
+import arrow.core.Try
+import arrow.core.identity
 import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.extensions.io.monad.monad
@@ -9,10 +11,10 @@ import java.util.*
 
 
 fun main(args: Array<String>) {
-    val seed = args[0].toLong()
-    val random = Random(seed)
 
-    val guessingGame = GuessingGame(ConsoleIO, RandomIntIO(random), IO.monad())
+    val random = Try { Random(args[0].toLong()) }.fold({ Random() }, { identity(it) })
+
+    val guessingGame = GuessingGame(ConsoleIO, RandomNaturalIO(random), IO.monad())
 
     val program: IO<Unit> = guessingGame.play().fix()
 
@@ -24,6 +26,6 @@ object ConsoleIO : Console<ForIO> {
     override fun writeLn(msg: String): Kind<ForIO, Unit> = IO { println(msg) }
 }
 
-class RandomIntIO(private val random: Random) : RandomInt<ForIO> {
-    override fun next(upper: Int): Kind<ForIO, Int> = IO { random.nextInt(upper) }
+class RandomNaturalIO(private val random: Random) : RandomNatural<ForIO> {
+    override fun upTo(upper: Int): Kind<ForIO, Int> = IO { random.nextInt(upper) + 1 }
 }
