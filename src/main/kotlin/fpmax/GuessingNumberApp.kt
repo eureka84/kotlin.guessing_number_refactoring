@@ -12,7 +12,9 @@ fun main(args: Array<String>) {
     val seed = args[0].toLong()
     val random = Random(seed)
 
-    val program: IO<Unit> = GuessingGame(ConsoleIO, RandomIO(random), IO.monad()).play().fix()
+    val guessingGame = GuessingGame(ConsoleIO, RandomIO(random), IO.monad())
+
+    val program: IO<Unit> = guessingGame.play().fix()
 
     program.unsafeRunSync()
 }
