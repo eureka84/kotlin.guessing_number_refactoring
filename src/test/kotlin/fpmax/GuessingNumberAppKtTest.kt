@@ -10,16 +10,17 @@ import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.PrintStream
 
+val LS: String = System.getProperty("line.separator")
+
 class GuessingNumberAppKtTest {
 
-    val swapStreams = { inputStream: InputStream, printStream: PrintStream ->
+    private val swapStreams = { inputStream: InputStream, printStream: PrintStream ->
         System.setIn(inputStream)
         System.setOut(printStream)
     }
-    lateinit var initialOut: PrintStream
-    lateinit var initialIn: InputStream
-    lateinit var outputStream: ByteArrayOutputStream
-
+    private lateinit var initialOut: PrintStream
+    private lateinit var initialIn: InputStream
+    private lateinit var outputStream: ByteArrayOutputStream
 
     @Before
     fun setUp() {
@@ -27,18 +28,14 @@ class GuessingNumberAppKtTest {
         initialIn = System.`in`
         outputStream = ByteArrayOutputStream()
     }
+
     @After
     fun tearDown() {
         swapStreams(initialIn, initialOut)
     }
-
     @Test
     fun correctFirstGuess() {
-        val inputs = listOf(
-            "Angelo",
-            "4",
-            "n"
-        ).joinToString(System.getProperty("line.separator"))
+        val inputs = listOf("Angelo", "4", "n").joinToString(LS)
         swapStreams(
             ByteArrayInputStream(inputs.toByteArray()),
             PrintStream(outputStream)
@@ -59,13 +56,7 @@ class GuessingNumberAppKtTest {
 
     @Test
     fun wrongGuesses() {
-        val inputs = listOf(
-            "Angelo",
-            "4",
-            "f",
-            "3",
-            "n"
-        ).joinToString(System.getProperty("line.separator"))
+        val inputs = listOf("Angelo", "4", "f", "3", "n").joinToString(LS)
         swapStreams(
             ByteArrayInputStream(inputs.toByteArray()),
             PrintStream(outputStream)
