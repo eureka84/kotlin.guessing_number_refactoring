@@ -10,8 +10,8 @@ import arrow.effects.fix
 import java.util.*
 
 fun main(args: Array<String>) {
-    val random = Try {Random(args[0].toLong()) }.getOrElse { Random() }
-    val guessingGame = GuessingGame(ConsoleIO, RandomIO(random), IO.monad())
+    val random = Try { Random(args[0].toLong()) }.getOrElse { Random() }
+    val guessingGame = GuessingGame(ConsoleIO, RandomNaturalIO(random), IO.monad())
     val program: IO<Unit> = guessingGame.play().fix()
 
     program.unsafeRunSync()
