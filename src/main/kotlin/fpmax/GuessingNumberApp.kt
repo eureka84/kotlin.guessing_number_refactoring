@@ -1,19 +1,17 @@
 package fpmax
 
 import arrow.Kind
+import arrow.core.Try
+import arrow.core.getOrElse
 import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.extensions.io.monad.monad
 import arrow.effects.fix
 import java.util.*
 
-
 fun main(args: Array<String>) {
-    val seed = args[0].toLong()
-    val random = Random(seed)
-
+    val random = Try {Random(args[0].toLong()) }.getOrElse { Random() }
     val guessingGame = GuessingGame(ConsoleIO, RandomIO(random), IO.monad())
-
     val program: IO<Unit> = guessingGame.play().fix()
 
     program.unsafeRunSync()
@@ -25,5 +23,5 @@ object ConsoleIO : Console<ForIO> {
 }
 
 class RandomIO(private val random: Random) : CustomRandom<ForIO> {
-    override fun nextInt(upper: Int): Kind<ForIO, Int> = IO { random.nextInt(upper) }
+    override fun upTo(upper: Int): Kind<ForIO, Int> = IO { random.nextInt(upper) + 1}
 }

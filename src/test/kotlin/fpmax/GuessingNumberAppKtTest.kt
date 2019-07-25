@@ -1,7 +1,9 @@
 package fpmax
 
 import org.hamcrest.CoreMatchers.equalTo
+import org.junit.After
 import org.junit.Assert.assertThat
+import org.junit.Before
 import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -10,15 +12,28 @@ import java.io.PrintStream
 
 class GuessingNumberAppKtTest {
 
+    val swapStreams = { inputStream: InputStream, printStream: PrintStream ->
+        System.setIn(inputStream)
+        System.setOut(printStream)
+    }
+    lateinit var initialOut: PrintStream
+    lateinit var initialIn: InputStream
+    lateinit var outputStream: ByteArrayOutputStream
+
+
+    @Before
+    fun setUp() {
+        initialOut = System.out
+        initialIn = System.`in`
+        outputStream = ByteArrayOutputStream()
+    }
+    @After
+    fun tearDown() {
+        swapStreams(initialIn, initialOut)
+    }
+
     @Test
     fun correctFirstGuess() {
-        val swapStreams = { inputStream: InputStream, printStream: PrintStream ->
-            System.setIn(inputStream)
-            System.setOut(printStream)
-        }
-        val initialOut = System.out
-        val initialIn = System.`in`
-        val byteArrayOutputStream = ByteArrayOutputStream()
         val inputs = listOf(
             "Angelo",
             "4",
@@ -26,16 +41,13 @@ class GuessingNumberAppKtTest {
         ).joinToString(System.getProperty("line.separator"))
         swapStreams(
             ByteArrayInputStream(inputs.toByteArray()),
-            PrintStream(byteArrayOutputStream)
+            PrintStream(outputStream)
         )
 
-        val seed = "2"
-        main(arrayOf(seed))
-
-        swapStreams(initialIn, initialOut)
+        main(arrayOf("2"))
 
         assertThat(
-            byteArrayOutputStream.toString(), equalTo(
+            outputStream.toString(), equalTo(
                 "What is your name?\n" +
                         "Hello, Angelo, welcome to the game!\n" +
                         "Dear Angelo, please guess a number from 1 to 5:\n" +
@@ -47,13 +59,6 @@ class GuessingNumberAppKtTest {
 
     @Test
     fun wrongGuesses() {
-        val swapStreams = { inputStream: InputStream, printStream: PrintStream ->
-            System.setIn(inputStream)
-            System.setOut(printStream)
-        }
-        val initialOut = System.out
-        val initialIn = System.`in`
-        val byteArrayOutputStream = ByteArrayOutputStream()
         val inputs = listOf(
             "Angelo",
             "4",
@@ -63,16 +68,13 @@ class GuessingNumberAppKtTest {
         ).joinToString(System.getProperty("line.separator"))
         swapStreams(
             ByteArrayInputStream(inputs.toByteArray()),
-            PrintStream(byteArrayOutputStream)
+            PrintStream(outputStream)
         )
 
-        val seed = "3"
-        main(arrayOf(seed))
-
-        swapStreams(initialIn, initialOut)
+        main(arrayOf("3"))
 
         assertThat(
-            byteArrayOutputStream.toString(), equalTo(
+            outputStream.toString(), equalTo(
                 "What is your name?\n" +
                         "Hello, Angelo, welcome to the game!\n" +
                         "Dear Angelo, please guess a number from 1 to 5:\n" +

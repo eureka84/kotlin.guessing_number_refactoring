@@ -12,7 +12,7 @@ interface Console<E> {
 }
 
 interface CustomRandom<E> {
-    fun nextInt(upper: Int): Kind<E, Int>
+    fun upTo(upper: Int): Kind<E, Int>
 }
 
 class GuessingGame<E>(
@@ -33,8 +33,7 @@ class GuessingGame<E>(
 
     private fun gameLoop(player: String?): Kind<E, Unit> = monad.run {
         random
-            .nextInt(5)
-            .map { it + 1 }
+            .upTo(5)
             .flatMap { num -> askPlayerToGuess(player, num) }
     }
 
