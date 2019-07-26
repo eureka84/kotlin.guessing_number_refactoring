@@ -1,12 +1,14 @@
 package fpmax
 
 import arrow.Kind
-import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.Tuple2
 import arrow.core.extensions.id.monad.monad
-import arrow.data.*
+import arrow.data.State
+import arrow.data.StatePartialOf
 import arrow.data.extensions.statet.monad.monad
+import arrow.data.fix
+import arrow.data.run
 import arrow.typeclasses.Monad
 import org.hamcrest.core.IsEqual.equalTo
 import org.junit.Assert.assertThat
@@ -14,8 +16,8 @@ import org.junit.Test
 
 class GuessingNumberTest {
 
-    private val monad: Monad<Kind<Kind<ForStateT, ForId>, TestData>> = State.monad(Id.monad())
-    private val guessingGame: GuessingGame<Kind<Kind<ForStateT, ForId>, TestData>> = GuessingGame(
+    private val monad: Monad<StatePartialOf<TestData>> = State.monad(Id.monad())
+    private val guessingGame: GuessingGame<StatePartialOf<TestData>> = GuessingGame(
         TestConsole(),
         TestRandomNatural(),
         monad
