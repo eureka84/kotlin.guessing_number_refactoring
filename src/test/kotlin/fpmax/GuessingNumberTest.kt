@@ -73,7 +73,7 @@ class TestConsole : Console<StatePartialOf<TestData>> {
     override fun writeLn(msg: String): Kind<StatePartialOf<TestData>, Unit> =
         State { testData: TestData ->
             Tuple2(testData.copy(outputs = testData.outputs + msg), Unit)
-        }.fix()
+        }
 
     override fun readLn(): Kind<StatePartialOf<TestData>, String?> =
         State { testData: TestData ->
