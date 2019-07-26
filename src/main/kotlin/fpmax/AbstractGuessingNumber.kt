@@ -1,6 +1,7 @@
 package fpmax
 
 import arrow.Kind
+import arrow.core.ForOption
 import arrow.core.Option
 import arrow.core.Try
 import arrow.core.extensions.option.traverse.sequence
@@ -35,19 +36,19 @@ class GuessingGame<E>(
         randomNatural
             .upTo(5)
             .flatMap { num -> askPlayerToGuess(player, num) }
-    }
-
-    private fun askPlayerToGuess(player: String?, num: Int): Kind<E, Unit> = monad.run {
-        console
-            .writeLn("Dear $player, please guess a number from 1 to 5:")
-            .flatMap { readGuess() }
-            .flatMap { guess -> evaluateGuess(guess, num, player) }
             .flatMap { console.writeLn("Do you want to continue, $player?") }
             .flatMap { checkContinue({ monad.just(Unit) }, { gameLoop(player) }) }
     }
 
+    private fun askPlayerToGuess(player: String?, num: Int): Kind<E, Kind<ForOption, Unit>> = monad.run {
+        console
+            .writeLn("Dear $player, please guess a number from 1 to 5:")
+            .flatMap { readGuess() }
+            .flatMap { guess -> evaluateGuess(guess, num, player) }
+    }
 
-    private fun evaluateGuess(guess: Option<Int>, num: Int, player: String?) =
+
+    private fun evaluateGuess(guess: Option<Int>, num: Int, player: String?): Kind<E, Kind<ForOption, Unit>> =
         guess
             .map { numberGuessed -> numberGuessed == num }
             .map { guessedRight ->
@@ -61,7 +62,7 @@ class GuessingGame<E>(
         console.readLn().map { input -> Try { input!!.toInt() }.toOption() }
     }
 
-    private fun checkContinue(ifNo: () -> Kind<E, Unit>, ifYes: () -> Kind<E, Unit>) = monad.run {
+    private fun checkContinue(ifNo: () -> Kind<E, Unit>, ifYes: () -> Kind<E, Unit>): Kind<E, Unit> = monad.run {
         console.readLn().flatMap { input ->
             when (input?.toLowerCase()) {
                 "y" -> ifYes()
