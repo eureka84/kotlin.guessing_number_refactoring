@@ -30,13 +30,17 @@ class GuessingNumberTest {
 
         val (final: TestData, _) = program.run(initial)
 
-        assertThat(final.outputs, equalTo(listOf(
-            "What is your name?",
-            "Hello, Angelo, welcome to the game!",
-            "Dear Angelo, please guess a number from 1 to 5:",
-            "You guessed right, Angelo!",
-            "Do you want to continue, Angelo?"
-        )))
+        assertThat(
+            final.outputs, equalTo(
+                listOf(
+                    "What is your name?",
+                    "Hello, Angelo, welcome to the game!",
+                    "Dear Angelo, please guess a number from 1 to 5:",
+                    "You guessed right, Angelo!",
+                    "Do you want to continue, Angelo?"
+                )
+            )
+        )
     }
 
     @Test
@@ -45,35 +49,43 @@ class GuessingNumberTest {
 
         val (final: TestData, _) = program.run(initial)
 
-        assertThat(final.outputs, equalTo(listOf(
-            "What is your name?",
-            "Hello, Angelo, welcome to the game!",
-            "Dear Angelo, please guess a number from 1 to 5:",
-            "You guessed wrong, Angelo! The number was: 5",
-            "Do you want to continue, Angelo?",
-            "Dear Angelo, please guess a number from 1 to 5:",
-            "You guessed wrong, Angelo! The number was: 5",
-            "Do you want to continue, Angelo?"
-        )))
+        assertThat(
+            final.outputs, equalTo(
+                listOf(
+                    "What is your name?",
+                    "Hello, Angelo, welcome to the game!",
+                    "Dear Angelo, please guess a number from 1 to 5:",
+                    "You guessed wrong, Angelo! The number was: 5",
+                    "Do you want to continue, Angelo?",
+                    "Dear Angelo, please guess a number from 1 to 5:",
+                    "You guessed wrong, Angelo! The number was: 5",
+                    "Do you want to continue, Angelo?"
+                )
+            )
+        )
     }
 
 }
 
 data class TestData(val inputs: List<String>, val outputs: List<String>, val num: Int)
 
-class TestConsole: Console<StatePartialOf<TestData>> {
-    override fun writeLn(msg: String): Kind<StatePartialOf<TestData>, Unit> = State { testData: TestData ->
-        Tuple2(testData.copy(outputs = testData.outputs + msg), Unit) }.fix()
+class TestConsole : Console<StatePartialOf<TestData>> {
+    override fun writeLn(msg: String): Kind<StatePartialOf<TestData>, Unit> =
+        State { testData: TestData ->
+            Tuple2(testData.copy(outputs = testData.outputs + msg), Unit)
+        }.fix()
 
     override fun readLn(): Kind<StatePartialOf<TestData>, String?> =
-        State { testData: TestData -> Tuple2(
-            testData.copy(inputs = testData.inputs.subList(1, testData.inputs.size)),
-            testData.inputs.first()
-        ) }
+        State { testData: TestData ->
+            Tuple2(
+                testData.copy(inputs = testData.inputs.subList(1, testData.inputs.size)),
+                testData.inputs.first()
+            )
+        }
 }
 
-class TestRandomNatural: RandomNatural<StatePartialOf<TestData>> {
+class TestRandomNatural : RandomNatural<StatePartialOf<TestData>> {
     override fun upTo(upper: Int): Kind<StatePartialOf<TestData>, Int> =
-        State { testData: TestData -> Tuple2(testData, testData.num)}
+        State { testData: TestData -> Tuple2(testData, testData.num) }
 
 }
