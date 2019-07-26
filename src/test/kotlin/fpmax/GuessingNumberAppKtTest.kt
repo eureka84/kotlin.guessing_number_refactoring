@@ -5,10 +5,7 @@ import org.junit.After
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
-import java.io.PrintStream
+import java.io.*
 
 val LS: String = System.getProperty("line.separator")
 
@@ -20,7 +17,7 @@ class GuessingNumberAppKtTest {
     }
     private lateinit var initialOut: PrintStream
     private lateinit var initialIn: InputStream
-    private lateinit var outputStream: ByteArrayOutputStream
+    private lateinit var outputStream: OutputStream
 
     @Before
     fun setUp() {
