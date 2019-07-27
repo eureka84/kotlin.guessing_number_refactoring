@@ -9,7 +9,7 @@ import java.io.*
 
 val LS: String = System.getProperty("line.separator")
 
-class GuessingNumberAppKtTest {
+class AppKtTest {
 
     private val swapStreams = { inputStream: InputStream, printStream: PrintStream ->
         System.setIn(inputStream)
