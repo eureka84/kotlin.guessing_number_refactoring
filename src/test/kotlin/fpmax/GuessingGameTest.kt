@@ -45,7 +45,7 @@ class GuessingNumberTest {
 
     @Test
     fun wrongGuesses() {
-        val initial = TestData(inputs = listOf("Angelo", "4", "f", "3", "n"), outputs = listOf(), num = 5)
+        val initial = TestData(inputs = listOf("Angelo", "4", "f", "y", "s", "3", "n"), outputs = listOf(), num = 5)
 
         val (final: TestData, _) = program.run(initial)
 
@@ -57,6 +57,10 @@ class GuessingNumberTest {
                     "Dear Angelo, please guess a number from 1 to 5:",
                     "You guessed wrong, Angelo! The number was: 5",
                     "Do you want to continue, Angelo?",
+                    "Dear Angelo enter y/n",
+                    "Do you want to continue, Angelo?",
+                    "Dear Angelo, please guess a number from 1 to 5:",
+                    "Dear Angelo you have not entered a number",
                     "Dear Angelo, please guess a number from 1 to 5:",
                     "You guessed wrong, Angelo! The number was: 5",
                     "Do you want to continue, Angelo?"
