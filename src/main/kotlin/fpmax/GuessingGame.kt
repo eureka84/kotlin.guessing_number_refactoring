@@ -39,14 +39,8 @@ class GuessingGame<E>(
 
     private fun askAndEvaluatePlayerGuess(player: String?, num: Int) = monad.run {
         readGuess(player)
-            .flatMap { guess ->
-                if (guess == num)
-                    console.writeLn("You guessed right, $player!")
-                else
-                    console.writeLn("You guessed wrong, $player! The number was: $num")
-            }
+            .flatMap { guess -> evaluateGuess(guess, num, player) }
     }
-
 
     private fun readGuess(player: String?): Kind<E, Int> = monad.run {
         console
@@ -61,6 +55,13 @@ class GuessingGame<E>(
                         .flatMap { readGuess(player) }
                 }
             }
+    }
+
+    private fun evaluateGuess(guess: Int, num: Int, player: String?): Kind<E, Unit> {
+        return if (guess == num)
+            console.writeLn("You guessed right, $player!")
+        else
+            console.writeLn("You guessed wrong, $player! The number was: $num")
     }
 
     private fun checkContinue(
