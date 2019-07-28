@@ -21,8 +21,7 @@ class GuessingGame<E>(
 ) {
     fun play(): Kind<E, Unit> = monad.run {
         console
-            .writeLn("What is your name?")
-            .flatMap { console.readLn() }
+            .ask("What is your name?")
             .flatMap { name ->
                 console
                     .writeLn("Hello, $name, welcome to the game!")
@@ -44,8 +43,7 @@ class GuessingGame<E>(
 
     private fun readGuess(player: String?): Kind<E, Int> = monad.run {
         console
-            .writeLn("Dear $player, please guess a number from 1 to 5:")
-            .flatMap { console.readLn() }
+            .ask("Dear $player, please guess a number from 1 to 5:")
             .flatMap { input ->
                 Try {
                     monad.just(input!!.toInt())
@@ -68,20 +66,21 @@ class GuessingGame<E>(
         player: String?, ifNo: () -> Kind<E, Unit>, ifYes: () -> Kind<E, Unit>
     ): Kind<E, Unit> = monad.run {
         console
-            .writeLn("Do you want to continue, $player?")
-            .flatMap {
-                console.readLn().flatMap { input ->
-                    when (input?.toLowerCase()) {
-                        "y" -> ifYes()
-                        "n" -> ifNo()
-                        else -> {
-                            console
-                                .writeLn("Dear $player enter y/n")
-                                .flatMap { checkContinue(player, ifNo, ifYes) }
-                        }
+            .ask("Do you want to continue, $player?")
+            .flatMap { input ->
+                when (input?.toLowerCase()) {
+                    "y" -> ifYes()
+                    "n" -> ifNo()
+                    else -> {
+                        console
+                            .writeLn("Dear $player enter y/n")
+                            .flatMap { checkContinue(player, ifNo, ifYes) }
                     }
                 }
             }
+    }
 
+    private fun Console<E>.ask(question: String): Kind<E, String?> = monad.run {
+        writeLn(question).flatMap { readLn() }
     }
 }
