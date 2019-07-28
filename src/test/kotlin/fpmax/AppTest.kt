@@ -53,7 +53,7 @@ class AppKtTest {
 
     @Test
     fun wrongGuesses() {
-        val inputs = listOf("Angelo", "4", "f", "3", "n").joinToString(LS)
+        val inputs = listOf("Angelo", "4", "y", "3", "n").joinToString(LS)
         swapStreams(
             ByteArrayInputStream(inputs.toByteArray()),
             PrintStream(outputStream)
