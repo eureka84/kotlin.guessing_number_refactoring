@@ -44,9 +44,9 @@ class GuessingGame<E>(
     private fun readGuess(player: String?): Kind<E, Int> = monad.run {
         console
             .ask("Dear $player, please guess a number from 1 to 5:")
-            .flatMap { input ->
+            .flatMap { guess ->
                 Try {
-                    monad.just(input!!.toInt())
+                    monad.just(guess!!.toInt())
                 }.getOrElse {
                     console
                         .writeLn("Dear $player you have not entered a number")
@@ -67,8 +67,8 @@ class GuessingGame<E>(
     ): Kind<E, Unit> = monad.run {
         console
             .ask("Do you want to continue, $player?")
-            .flatMap { input ->
-                when (input?.toLowerCase()) {
+            .flatMap { ans ->
+                when (ans?.toLowerCase()) {
                     "y" -> ifYes()
                     "n" -> ifNo()
                     else -> {
