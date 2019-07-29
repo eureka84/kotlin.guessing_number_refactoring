@@ -55,12 +55,11 @@ class GuessingGame<E>(
             }
     }
 
-    private fun evaluateGuess(guess: Int, num: Int, player: String?): Kind<E, Unit> {
-        return if (guess == num)
+    private fun evaluateGuess(guess: Int, num: Int, player: String?): Kind<E, Unit> =
+        if (guess == num)
             console.writeLn("You guessed right, $player!")
         else
             console.writeLn("You guessed wrong, $player! The number was: $num")
-    }
 
     private fun checkContinue(
         player: String?, ifNo: () -> Kind<E, Unit>, ifYes: () -> Kind<E, Unit>
