@@ -2,7 +2,6 @@ package fpmax
 
 import arrow.Kind
 import arrow.core.Try
-import arrow.core.getOrElse
 import arrow.typeclasses.Monad
 
 interface Console<E> {
@@ -45,13 +44,14 @@ class GuessingGame<E>(
         console
             .ask("Dear $player, please guess a number from 1 to 5:")
             .flatMap { guess ->
-                Try {
-                    monad.just(guess!!.toInt())
-                }.getOrElse {
-                    console
-                        .writeLn("Dear $player you have not entered a number")
-                        .flatMap { readGuess(player) }
-                }
+                Try { guess!!.toInt() }.fold(
+                    {
+                        console
+                            .writeLn("Dear $player you have not entered a number")
+                            .flatMap { readGuess(player) }
+                    },
+                    { monad.just(it) }
+                )
             }
     }
 
