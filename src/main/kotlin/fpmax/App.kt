@@ -12,23 +12,27 @@ import java.util.*
 
 fun main(args: Array<String>) {
     val random = Try { Random(args[0].toLong()) }.getOrElse { Random() }
+    val randomModuleIO = object : RandomModule<ForIO> {
+        override val randomNatural: RandomModule.RandomNatural<ForIO> =
+            object : RandomModule.RandomNatural<ForIO> {
+                override fun upTo(upper: Int): Kind<ForIO, Int> = IO { random.nextInt(upper) + 1 }
+            }
+    }
     val guessingGame: GuessingGame<ForIO> =
-        object : GuessingGame<ForIO>, Monad<ForIO> by IO.monad() {
-            override val console: ConsoleModule.Console<ForIO> = ConsoleIO
-            override val randomNatural: RandomModule.RandomNatural<ForIO> = RandomNaturalIO(random)
-        }
+        object : GuessingGame<ForIO>,
+            Monad<ForIO> by IO.monad(),
+            ConsoleModule<ForIO> by ConsoleModuleIO,
+            RandomModule<ForIO> by randomModuleIO {}
 
     val program: IO<Unit> = guessingGame.play().fix()
 
     program.unsafeRunSync()
 }
 
-
-object ConsoleIO : ConsoleModule.Console<ForIO>, Monad<ForIO> by IO.monad() {
-    override fun readLn(): Kind<ForIO, String?> = IO { readLine() }
-    override fun writeLn(msg: String): Kind<ForIO, Unit> = IO { println(msg) }
-}
-
-class RandomNaturalIO(private val random: Random) : RandomModule.RandomNatural<ForIO> {
-    override fun upTo(upper: Int): Kind<ForIO, Int> = IO { random.nextInt(upper) + 1 }
+object ConsoleModuleIO : ConsoleModule<ForIO> {
+    override val console: ConsoleModule.Console<ForIO> =
+        object : ConsoleModule.Console<ForIO>, Monad<ForIO> by IO.monad() {
+            override fun readLn(): Kind<ForIO, String?> = IO { readLine() }
+            override fun writeLn(msg: String): Kind<ForIO, Unit> = IO { println(msg) }
+        }
 }

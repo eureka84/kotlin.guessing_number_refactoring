@@ -19,10 +19,10 @@ typealias TestState = StatePartialOf<TestData>
 class GuessingNumberTest {
 
     private val guessingGame: GuessingGame<TestState> =
-        object : GuessingGame<TestState>, Monad<TestState> by State.monad(Id.monad()) {
-            override val console: ConsoleModule.Console<TestState> = TestConsole()
-            override val randomNatural: RandomModule.RandomNatural<TestState> = TestRandomNatural()
-        }
+        object : GuessingGame<TestState>,
+            Monad<TestState> by State.monad(Id.monad()),
+            ConsoleModule<TestState> by TestConsoleModule,
+            RandomModule<TestState> by TestRandomModule {}
 
     private val program: State<TestData, Unit> = guessingGame.play().fix()
 
@@ -75,23 +75,29 @@ class GuessingNumberTest {
 
 data class TestData(val inputs: List<String>, val outputs: List<String>, val num: Int)
 
-class TestConsole : ConsoleModule.Console<TestState>, Monad<TestState> by State.monad(Id.monad()) {
-    override fun writeLn(msg: String): Kind<TestState, Unit> =
-        State { testData: TestData ->
-            Tuple2(testData.copy(outputs = testData.outputs + msg), Unit)
-        }
+object TestConsoleModule : ConsoleModule<TestState> {
+    override val console: ConsoleModule.Console<TestState> =
+        object : ConsoleModule.Console<TestState>, Monad<TestState> by State.monad(Id.monad()) {
+            override fun writeLn(msg: String): Kind<TestState, Unit> =
+                State { testData: TestData ->
+                    Tuple2(testData.copy(outputs = testData.outputs + msg), Unit)
+                }
 
-    override fun readLn(): Kind<TestState, String?> =
-        State { testData: TestData ->
-            Tuple2(
-                testData.copy(inputs = testData.inputs.subList(1, testData.inputs.size)),
-                testData.inputs.first()
-            )
+            override fun readLn(): Kind<TestState, String?> =
+                State { testData: TestData ->
+                    Tuple2(
+                        testData.copy(inputs = testData.inputs.subList(1, testData.inputs.size)),
+                        testData.inputs.first()
+                    )
+                }
         }
 }
 
-class TestRandomNatural : RandomModule.RandomNatural<TestState> {
-    override fun upTo(upper: Int): Kind<TestState, Int> =
-        State { testData: TestData -> Tuple2(testData, testData.num) }
-
+object TestRandomModule : RandomModule<TestState> {
+    override val randomNatural: RandomModule.RandomNatural<TestState> =
+        object : RandomModule.RandomNatural<TestState> {
+            override fun upTo(upper: Int): Kind<TestState, Int> =
+                State { testData: TestData -> Tuple2(testData, testData.num) }
+        }
 }
+
