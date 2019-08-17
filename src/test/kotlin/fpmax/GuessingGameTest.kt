@@ -18,8 +18,8 @@ class GuessingNumberTest {
 
     private val guessingGame: GuessingGame<StatePartialOf<TestData>> =
         object : GuessingGame<StatePartialOf<TestData>>, Monad<StatePartialOf<TestData>> by State.monad(Id.monad()) {
-            override val console: Console<StatePartialOf<TestData>> = TestConsole()
-            override val randomNatural: RandomNatural<StatePartialOf<TestData>> = TestRandomNatural()
+            override val console: ConsoleModule.Console<StatePartialOf<TestData>> = TestConsole()
+            override val randomNatural: RandomModule.RandomNatural<StatePartialOf<TestData>> = TestRandomNatural()
         }
 
     private val program: State<TestData, Unit> = guessingGame.play().fix()
@@ -73,7 +73,7 @@ class GuessingNumberTest {
 
 data class TestData(val inputs: List<String>, val outputs: List<String>, val num: Int)
 
-class TestConsole : Console<StatePartialOf<TestData>> {
+class TestConsole : ConsoleModule.Console<StatePartialOf<TestData>> {
     override fun writeLn(msg: String): Kind<StatePartialOf<TestData>, Unit> =
         State { testData: TestData ->
             Tuple2(testData.copy(outputs = testData.outputs + msg), Unit)
@@ -88,7 +88,7 @@ class TestConsole : Console<StatePartialOf<TestData>> {
         }
 }
 
-class TestRandomNatural : RandomNatural<StatePartialOf<TestData>> {
+class TestRandomNatural : RandomModule.RandomNatural<StatePartialOf<TestData>> {
     override fun upTo(upper: Int): Kind<StatePartialOf<TestData>, Int> =
         State { testData: TestData -> Tuple2(testData, testData.num) }
 

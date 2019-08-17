@@ -4,19 +4,24 @@ import arrow.Kind
 import arrow.core.Try
 import arrow.typeclasses.Monad
 
-interface Console<E> {
-    fun writeLn(msg: String): Kind<E, Unit>
-    fun readLn(): Kind<E, String?>
-}
-
-interface RandomNatural<E> {
-    fun upTo(upper: Int): Kind<E, Int>
-}
-
-interface GuessingGame<E> : Monad<E> {
-
+interface ConsoleModule<E> {
     val console: Console<E>
+
+    interface Console<E> {
+        fun writeLn(msg: String): Kind<E, Unit>
+        fun readLn(): Kind<E, String?>
+    }
+}
+
+interface RandomModule<E> {
     val randomNatural: RandomNatural<E>
+
+    interface RandomNatural<E> {
+        fun upTo(upper: Int): Kind<E, Int>
+    }
+}
+
+interface GuessingGame<E> : Monad<E>, ConsoleModule<E>, RandomModule<E> {
 
     fun play(): Kind<E, Unit> =
         ask("What is your name?")
@@ -53,13 +58,15 @@ interface GuessingGame<E> : Monad<E> {
         player: String?, ifNo: () -> Kind<E, Unit>, ifYes: () -> Kind<E, Unit>
     ): Kind<E, Unit> =
         ask("Do you want to continue, $player?")
-            .flatMap { ans -> when (ans?.toLowerCase()) {
-                                "y" -> ifYes()
-                                "n" -> ifNo()
-                                else -> { console.writeLn("Dear $player enter y/n")
-                                                 .flatMap { checkContinue(player, ifNo, ifYes) }
-                                        }
-                                }
+            .flatMap { ans ->
+                when (ans?.toLowerCase()) {
+                    "y" -> ifYes()
+                    "n" -> ifNo()
+                    else -> {
+                        console.writeLn("Dear $player enter y/n")
+                            .flatMap { checkContinue(player, ifNo, ifYes) }
+                    }
+                }
             }
 
     private fun ask(question: String): Kind<E, String?> =
