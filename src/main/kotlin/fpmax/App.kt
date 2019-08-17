@@ -7,11 +7,17 @@ import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.extensions.io.monad.monad
 import arrow.effects.fix
+import arrow.typeclasses.Monad
 import java.util.*
 
 fun main(args: Array<String>) {
     val random = Try { Random(args[0].toLong()) }.getOrElse { Random() }
-    val guessingGame = GuessingGame(ConsoleIO, RandomNaturalIO(random), IO.monad())
+    val guessingGame: GuessingGame<ForIO> =
+        object : GuessingGame<ForIO>, Monad<ForIO> by IO.monad() {
+            override val console: Console<ForIO> = ConsoleIO
+            override val randomNatural: RandomNatural<ForIO> = RandomNaturalIO(random)
+        }
+
     val program: IO<Unit> = guessingGame.play().fix()
 
     program.unsafeRunSync()

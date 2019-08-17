@@ -16,12 +16,12 @@ import org.junit.Test
 
 class GuessingNumberTest {
 
-    private val monad: Monad<StatePartialOf<TestData>> = State.monad(Id.monad())
-    private val guessingGame: GuessingGame<StatePartialOf<TestData>> = GuessingGame(
-        TestConsole(),
-        TestRandomNatural(),
-        monad
-    )
+    private val guessingGame: GuessingGame<StatePartialOf<TestData>> =
+        object : GuessingGame<StatePartialOf<TestData>>, Monad<StatePartialOf<TestData>> by State.monad(Id.monad()) {
+            override val console: Console<StatePartialOf<TestData>> = TestConsole()
+            override val randomNatural: RandomNatural<StatePartialOf<TestData>> = TestRandomNatural()
+        }
+
     private val program: State<TestData, Unit> = guessingGame.play().fix()
 
     @Test
