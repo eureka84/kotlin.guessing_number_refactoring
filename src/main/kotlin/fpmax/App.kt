@@ -24,7 +24,7 @@ fun main(args: Array<String>) {
 }
 
 
-object ConsoleIO : ConsoleModule.Console<ForIO> {
+object ConsoleIO : ConsoleModule.Console<ForIO>, Monad<ForIO> by IO.monad() {
     override fun readLn(): Kind<ForIO, String?> = IO { readLine() }
     override fun writeLn(msg: String): Kind<ForIO, Unit> = IO { println(msg) }
 }

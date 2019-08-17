@@ -75,7 +75,7 @@ class GuessingNumberTest {
 
 data class TestData(val inputs: List<String>, val outputs: List<String>, val num: Int)
 
-class TestConsole : ConsoleModule.Console<TestState> {
+class TestConsole : ConsoleModule.Console<TestState>, Monad<TestState> by State.monad(Id.monad()) {
     override fun writeLn(msg: String): Kind<TestState, Unit> =
         State { testData: TestData ->
             Tuple2(testData.copy(outputs = testData.outputs + msg), Unit)

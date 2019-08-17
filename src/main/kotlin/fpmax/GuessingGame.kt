@@ -7,9 +7,10 @@ import arrow.typeclasses.Monad
 interface ConsoleModule<E> {
     val console: Console<E>
 
-    interface Console<E> {
+    interface Console<E> : Monad<E> {
         fun writeLn(msg: String): Kind<E, Unit>
         fun readLn(): Kind<E, String?>
+        fun ask(question: String): Kind<E, String?> = writeLn(question).flatMap { readLn() }
     }
 }
 
@@ -24,7 +25,7 @@ interface RandomModule<E> {
 interface GuessingGame<E> : Monad<E>, ConsoleModule<E>, RandomModule<E> {
 
     fun play(): Kind<E, Unit> =
-        ask("What is your name?")
+        console.ask("What is your name?")
             .flatMap { name ->
                 console.writeLn("Hello, $name, welcome to the game!")
                     .flatMap { gameLoop(name) }
@@ -40,7 +41,7 @@ interface GuessingGame<E> : Monad<E>, ConsoleModule<E>, RandomModule<E> {
             .flatMap { guess -> evaluateGuess(guess, num, player) }
 
     private fun readGuess(player: String?): Kind<E, Int> =
-        ask("Dear $player, please guess a number from 1 to 5:")
+        console.ask("Dear $player, please guess a number from 1 to 5:")
             .flatMap { guess ->
                 Try { guess!!.toInt() }.fold(
                     { console.writeLn("Dear $player you have not entered a number").flatMap { readGuess(player) } },
@@ -55,9 +56,11 @@ interface GuessingGame<E> : Monad<E>, ConsoleModule<E>, RandomModule<E> {
             console.writeLn("You guessed wrong, $player! The number was: $num")
 
     private fun checkContinue(
-        player: String?, ifNo: () -> Kind<E, Unit>, ifYes: () -> Kind<E, Unit>
+        player: String?,
+        ifNo: () -> Kind<E, Unit>,
+        ifYes: () -> Kind<E, Unit>
     ): Kind<E, Unit> =
-        ask("Do you want to continue, $player?")
+        console.ask("Do you want to continue, $player?")
             .flatMap { ans ->
                 when (ans?.toLowerCase()) {
                     "y" -> ifYes()
@@ -69,6 +72,4 @@ interface GuessingGame<E> : Monad<E>, ConsoleModule<E>, RandomModule<E> {
                 }
             }
 
-    private fun ask(question: String): Kind<E, String?> =
-        console.writeLn(question).flatMap { console.readLn() }
 }
