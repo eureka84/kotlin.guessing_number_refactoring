@@ -14,12 +14,14 @@ import org.hamcrest.core.IsEqual.equalTo
 import org.junit.Assert.assertThat
 import org.junit.Test
 
+typealias TestState = StatePartialOf<TestData>
+
 class GuessingNumberTest {
 
-    private val guessingGame: GuessingGame<StatePartialOf<TestData>> =
-        object : GuessingGame<StatePartialOf<TestData>>, Monad<StatePartialOf<TestData>> by State.monad(Id.monad()) {
-            override val console: ConsoleModule.Console<StatePartialOf<TestData>> = TestConsole()
-            override val randomNatural: RandomModule.RandomNatural<StatePartialOf<TestData>> = TestRandomNatural()
+    private val guessingGame: GuessingGame<TestState> =
+        object : GuessingGame<TestState>, Monad<TestState> by State.monad(Id.monad()) {
+            override val console: ConsoleModule.Console<TestState> = TestConsole()
+            override val randomNatural: RandomModule.RandomNatural<TestState> = TestRandomNatural()
         }
 
     private val program: State<TestData, Unit> = guessingGame.play().fix()
@@ -73,13 +75,13 @@ class GuessingNumberTest {
 
 data class TestData(val inputs: List<String>, val outputs: List<String>, val num: Int)
 
-class TestConsole : ConsoleModule.Console<StatePartialOf<TestData>> {
-    override fun writeLn(msg: String): Kind<StatePartialOf<TestData>, Unit> =
+class TestConsole : ConsoleModule.Console<TestState> {
+    override fun writeLn(msg: String): Kind<TestState, Unit> =
         State { testData: TestData ->
             Tuple2(testData.copy(outputs = testData.outputs + msg), Unit)
         }
 
-    override fun readLn(): Kind<StatePartialOf<TestData>, String?> =
+    override fun readLn(): Kind<TestState, String?> =
         State { testData: TestData ->
             Tuple2(
                 testData.copy(inputs = testData.inputs.subList(1, testData.inputs.size)),
@@ -88,8 +90,8 @@ class TestConsole : ConsoleModule.Console<StatePartialOf<TestData>> {
         }
 }
 
-class TestRandomNatural : RandomModule.RandomNatural<StatePartialOf<TestData>> {
-    override fun upTo(upper: Int): Kind<StatePartialOf<TestData>, Int> =
+class TestRandomNatural : RandomModule.RandomNatural<TestState> {
+    override fun upTo(upper: Int): Kind<TestState, Int> =
         State { testData: TestData -> Tuple2(testData, testData.num) }
 
 }
