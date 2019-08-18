@@ -28,13 +28,14 @@ interface GuessingGame<E> : Monad<E>, ConsoleModule<E>, RandomModule<E> {
     private fun readGuess(player: String?): Kind<E, Int> =
         console
             .ask("Dear $player, please guess a number from 1 to 5:")
-            .flatMap { guess ->
-                Try { guess!!.toInt() }
-                    .fold(
-                        { console.writeLn("Dear $player you have not entered a number").flatMap { readGuess(player) } },
-                        { just(it) }
-                    )
-            }
+            .flatMap { guess -> parseGuess(guess, player) }
+
+    private fun parseGuess(guess: String?, player: String?): Kind<E, Int> =
+        Try { guess!!.toInt() }
+            .fold(
+                { console.writeLn("Dear $player you have not entered a number").flatMap { readGuess(player) } },
+                { just(it) }
+            )
 
     private fun evaluateGuess(guess: Int, num: Int, player: String?): Kind<E, Unit> =
         if (guess == num)
@@ -42,11 +43,7 @@ interface GuessingGame<E> : Monad<E>, ConsoleModule<E>, RandomModule<E> {
         else
             console.writeLn("You guessed wrong, $player! The number was: $num")
 
-    private fun checkContinue(
-        player: String?,
-        ifNo: () -> Kind<E, Unit>,
-        ifYes: () -> Kind<E, Unit>
-    ): Kind<E, Unit> =
+    private fun checkContinue(player: String?, ifNo: () -> Kind<E, Unit>, ifYes: () -> Kind<E, Unit>): Kind<E, Unit> =
         console
             .ask("Do you want to continue, $player?")
             .flatMap { ans ->
