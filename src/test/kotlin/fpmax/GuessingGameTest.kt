@@ -14,8 +14,6 @@ import org.hamcrest.core.IsEqual.equalTo
 import org.junit.Assert.assertThat
 import org.junit.Test
 
-typealias TestState = StatePartialOf<TestData>
-
 class GuessingNumberTest {
 
     private val guessingGame: GuessingGame<TestState> =
@@ -72,6 +70,8 @@ class GuessingNumberTest {
     }
 
 }
+
+typealias TestState = StatePartialOf<TestData>
 
 data class TestData(val inputs: List<String>, val outputs: List<String>, val num: Int)
 
