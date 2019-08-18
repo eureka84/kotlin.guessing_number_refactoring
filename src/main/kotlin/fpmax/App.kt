@@ -11,11 +11,13 @@ import arrow.typeclasses.Monad
 import java.util.*
 
 fun main(args: Array<String>) {
+    mainIO(args).unsafeRunSync()
+}
+
+private fun mainIO(args: Array<String>): IO<Unit> {
     val random = Try { Random(args[0].toLong()) }.getOrElse { Random() }
     val guessingGame: GuessingGame<ForIO> = buildGuessingGame(random)
-    val program: IO<Unit> = guessingGame.play().fix()
-
-    program.unsafeRunSync()
+    return guessingGame.play().fix()
 }
 
 private fun buildGuessingGame(random: Random): GuessingGame<ForIO> {
