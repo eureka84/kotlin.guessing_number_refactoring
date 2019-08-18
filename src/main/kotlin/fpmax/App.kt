@@ -12,21 +12,26 @@ import java.util.*
 
 fun main(args: Array<String>) {
     val random = Try { Random(args[0].toLong()) }.getOrElse { Random() }
-    val randomModuleIO = object : RandomModule<ForIO> {
+    val guessingGame: GuessingGame<ForIO> = buildGuessingGame(random)
+    val program: IO<Unit> = guessingGame.play().fix()
+
+    program.unsafeRunSync()
+}
+
+private fun buildGuessingGame(random: Random): GuessingGame<ForIO> {
+    return object : GuessingGame<ForIO>,
+        Monad<ForIO> by IO.monad(),
+        ConsoleModule<ForIO> by ConsoleModuleIO,
+        RandomModule<ForIO> by randomModule(random) {}
+}
+
+private fun randomModule(random: Random): RandomModule<ForIO> {
+    return object : RandomModule<ForIO> {
         override val randomNatural: RandomModule.RandomNatural<ForIO> =
             object : RandomModule.RandomNatural<ForIO> {
                 override fun upTo(upper: Int): Kind<ForIO, Int> = IO { random.nextInt(upper) + 1 }
             }
     }
-    val guessingGame: GuessingGame<ForIO> =
-        object : GuessingGame<ForIO>,
-            Monad<ForIO> by IO.monad(),
-            ConsoleModule<ForIO> by ConsoleModuleIO,
-            RandomModule<ForIO> by randomModuleIO {}
-
-    val program: IO<Unit> = guessingGame.play().fix()
-
-    program.unsafeRunSync()
 }
 
 object ConsoleModuleIO : ConsoleModule<ForIO> {
