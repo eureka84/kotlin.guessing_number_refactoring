@@ -4,24 +4,6 @@ import arrow.Kind
 import arrow.core.Try
 import arrow.typeclasses.Monad
 
-interface ConsoleModule<E> {
-    val console: Console<E>
-
-    interface Console<E> : Monad<E> {
-        fun writeLn(msg: String): Kind<E, Unit>
-        fun readLn(): Kind<E, String?>
-        fun ask(question: String): Kind<E, String?> = writeLn(question).flatMap { readLn() }
-    }
-}
-
-interface RandomModule<E> {
-    val randomNatural: RandomNatural<E>
-
-    interface RandomNatural<E> {
-        fun upTo(upper: Int): Kind<E, Int>
-    }
-}
-
 interface GuessingGame<E> : Monad<E>, ConsoleModule<E>, RandomModule<E> {
 
     fun play(): Kind<E, Unit> =
