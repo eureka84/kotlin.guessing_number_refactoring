@@ -18,11 +18,11 @@ interface GuessingGame<E> : Monad<E>, ConsoleModule<E>, RandomModule<E> {
     private fun gameLoop(player: String?): Kind<E, Unit> =
         randomNatural
             .upTo(5)
-            .flatMap { num ->
-                readGuess(player)
-                    .flatMap { guess -> evaluateGuess(guess, num, player) }
-            }
+            .flatMap { num -> playerGuess(player, num) }
             .flatMap { checkContinue(player, { just(Unit) }, { gameLoop(player) }) }
+
+    fun playerGuess(player: String?, num: Int) =
+        readGuess(player).flatMap { guess -> evaluateGuess(guess, num, player) }
 
     private fun readGuess(player: String?): Kind<E, Int> =
         console
