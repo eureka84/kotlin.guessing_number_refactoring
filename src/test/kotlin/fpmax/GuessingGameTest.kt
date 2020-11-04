@@ -4,11 +4,12 @@ import arrow.Kind
 import arrow.core.Id
 import arrow.core.Tuple2
 import arrow.core.extensions.id.monad.monad
-import arrow.data.State
-import arrow.data.StatePartialOf
-import arrow.data.extensions.statet.monad.monad
-import arrow.data.fix
-import arrow.data.run
+import arrow.core.fix
+import arrow.core.value
+import arrow.mtl.State
+import arrow.mtl.StatePartialOf
+import arrow.mtl.extensions.statet.monad.monad
+import arrow.mtl.fix
 import arrow.typeclasses.Monad
 import org.hamcrest.core.IsEqual.equalTo
 import org.junit.Assert.assertThat
@@ -28,7 +29,7 @@ class GuessingNumberTest {
     fun correctFirstGuess() {
         val initial = TestData(inputs = listOf("Angelo", "4", "n"), outputs = listOf(), num = 4)
 
-        val (final: TestData, _) = program.run(initial)
+        val (final: TestData, _) = program.runF(initial).fix().value()
 
         assertThat(
             final.outputs, equalTo(
@@ -47,7 +48,7 @@ class GuessingNumberTest {
     fun wrongGuesses() {
         val initial = TestData(inputs = listOf("Angelo", "4", "f", "y", "s", "3", "n"), outputs = listOf(), num = 5)
 
-        val (final: TestData, _) = program.run(initial)
+        val (final: TestData, _) = program.runF(initial).fix().value()
 
         assertThat(
             final.outputs, equalTo(

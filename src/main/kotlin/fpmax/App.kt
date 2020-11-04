@@ -1,21 +1,24 @@
 package fpmax
 
 import arrow.Kind
-import arrow.core.Try
+import arrow.core.Either
 import arrow.core.getOrElse
-import arrow.effects.ForIO
-import arrow.effects.IO
-import arrow.effects.extensions.io.monad.monad
-import arrow.effects.fix
+import arrow.fx.ForIO
+import arrow.fx.IO
+import arrow.fx.coroutines.Environment
+import arrow.fx.extensions.io.monad.monad
+import arrow.fx.fix
 import arrow.typeclasses.Monad
 import java.util.*
 
 fun main(args: Array<String>) {
-    mainIO(args).unsafeRunSync()
+    Environment().unsafeRunSync {
+        mainIO(args).unsafeRunSync()
+    }
 }
 
-private fun mainIO(args: Array<String>): IO<Unit> {
-    val random = Try { Random(args[0].toLong()) }.getOrElse { Random() }
+private suspend fun mainIO(args: Array<String>): IO<Unit> {
+    val random = Either.catch { Random(args[0].toLong()) }.getOrElse { Random() }
     val guessingGame: GuessingGame<ForIO> = buildGuessingGame(random)
     return guessingGame.play().fix()
 }

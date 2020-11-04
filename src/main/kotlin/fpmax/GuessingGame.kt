@@ -1,7 +1,6 @@
 package fpmax
 
 import arrow.Kind
-import arrow.core.Try
 import arrow.typeclasses.Monad
 
 interface GuessingGame<E> : Monad<E>, ConsoleModule<E>, RandomModule<E> {
@@ -21,7 +20,7 @@ interface GuessingGame<E> : Monad<E>, ConsoleModule<E>, RandomModule<E> {
             .flatMap { num -> playerGuess(player, num) }
             .flatMap { checkContinue(player, { just(Unit) }, { gameLoop(player) }) }
 
-    fun playerGuess(player: String?, num: Int) =
+    private fun playerGuess(player: String?, num: Int) =
         readGuess(player).flatMap { guess -> evaluateGuess(guess, num, player) }
 
     private fun readGuess(player: String?): Kind<E, Int> =
@@ -30,11 +29,13 @@ interface GuessingGame<E> : Monad<E>, ConsoleModule<E>, RandomModule<E> {
             .flatMap { guess -> parseGuess(guess, player) }
 
     private fun parseGuess(guess: String?, player: String?): Kind<E, Int> =
-        Try { guess!!.toInt() }
-            .fold(
-                { console.writeLn("Dear $player you have not entered a number").flatMap { readGuess(player) } },
-                { just(it) }
-            )
+        try {
+            just(guess!!.toInt())
+        } catch (e: Throwable) {
+            console
+                .writeLn("Dear $player you have not entered a number")
+                .flatMap { readGuess(player) }
+        }
 
     private fun evaluateGuess(guess: Int, num: Int, player: String?): Kind<E, Unit> =
         if (guess == num)
